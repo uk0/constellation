@@ -22,6 +22,10 @@ on:
         description: CLI version to create a new cluster with. This has to be a released version, e.g., 'v2.1.3'.
         type: string
         required: true
+      fromKubernetes:
+        description: Kubernetes version for the origin cluster, empty for origin target's default version.
+        type: string
+        required: false
       gitRef:
         description: Ref to build upgrading CLI on, empty for HEAD.
         type: string
@@ -32,11 +36,11 @@ on:
         type: string
         required: false
       toKubernetes:
-        description: Kubernetes version to target for the upgrade, empty for target's default version.
+        description: Kubernetes version to target for the upgrade, empty for upgrade target's default version.
         type: string
         required: false
       toMicroservices:
-        description: Microservice version to target for the upgrade, empty for target's default version.
+        description: Microservice version to target for the upgrade, empty for upgrade target's default version.
         type: string
         required: false
       simulatedTargetVersion:
@@ -60,6 +64,10 @@ on:
         description: CLI version to create a new cluster with. This has to be a released version, e.g., 'v2.1.3'.
         type: string
         required: true
+      fromKubernetes:
+        description: Kubernetes version for the origin cluster, empty for origin target's default version.
+        type: string
+        required: false
       gitRef:
         description: Ref to build upgrading CLI on.
         type: string
@@ -90,7 +98,7 @@ on:
 jobs:
   generate-input-parameters:
     name: Generate input parameters
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       contents: read
@@ -126,7 +134,7 @@ jobs:
 
   build-target-cli:
     name: Build upgrade target version CLI
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       checks: write
@@ -177,7 +185,7 @@ jobs:
 
   create-cluster:
     name: Create upgrade origin version cluster
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       checks: write
@@ -215,6 +223,7 @@ jobs:
           osImage: ${{ inputs.fromVersion }}
           isDebugImage: "false"
           cliVersion: ${{ inputs.fromVersion }}
+          kubernetesVersion: ${{ inputs.fromKubernetes }}
           regionZone: ${{ inputs.regionZone }}
           gcpProject: constellation-e2e
           gcpClusterCreateServiceAccount: "infrastructure-e2e@constellation-e2e.iam.gserviceaccount.com"
@@ -262,7 +271,7 @@ jobs:
 
   e2e-upgrade:
     name: Run upgrade test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       checks: write
@@ -427,7 +436,7 @@ jobs:
 
   clean-up:
     name: Clean up resources
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       checks: write
